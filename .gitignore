@@ -1,10 +1,4 @@
 *.iml
 .idea
-
-### zig ###
-# Zig programming language
-
 .zig-cache/
 .zig-out/
-
-# End of https://www.toptal.com/developers/gitignore/api/zig,jetbrains+all
