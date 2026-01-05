@@ -1,15 +1,17 @@
 const std = @import("std");
 
-pub fn build(b: *std.Build, core: *std.Build.Step.Compile, test_step: *std.Build.Step) *std.Build.Step.Compile {
-    // Core library
-    const source = b.addLibrary(.{
-        .name = "source",
-        .root_module = b.createModule(.{
+pub fn build(b: *std.Build, test_step: *std.Build.Step) void {
+    const core = b.modules.get("core") orelse @panic("core module is missing");
+
+    const source = b.addModule(
+        "source",
+        .{
             .root_source_file = b.path("source/main.zig"),
             .target = b.graph.host,
-        }),
-    });
-    source.root_module.addImport("core", core.root_module);
+        },
+    );
+
+    source.addImport("core", core);
 
     const tests = [_][]const u8{"source/tests/array_source.zig"};
     for (tests) |a_test| {
@@ -19,11 +21,7 @@ pub fn build(b: *std.Build, core: *std.Build.Step.Compile, test_step: *std.Build
                 .target = b.graph.host,
             }),
         });
-        coreTests.root_module.addImport("source", source.root_module);
+        coreTests.root_module.addImport("source", source);
         test_step.dependOn(&b.addRunArtifact(coreTests).step);
     }
-
-    b.installArtifact(source);
-
-    return source;
 }
