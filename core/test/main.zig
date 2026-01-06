@@ -1,5 +1,5 @@
-const pair = @import("pair.zig");
-const tries = @import("try.zig");
+pub const pair = @import("pair.zig");
+pub const tries = @import("try.zig");
 
 test {
     @import("std").testing.refAllDecls(@This());

@@ -1,5 +1,5 @@
-const Pair = @import("core").data.Pair;
 const constCast = @import("core").fun.cast.asConst;
+const Pair = @import("core").data.Pair;
 
 pub fn Source(comptime T: type) type {
     return struct {

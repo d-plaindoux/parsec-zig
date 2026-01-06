@@ -17,10 +17,12 @@ pub fn build(b: *std.Build, test_step: *std.Build.Step) void {
 
     const tests = b.addTest(.{
         .root_module = b.createModule(.{
-            .root_source_file = b.path("core/test/main.zig"),
+            .root_source_file = b.path("parser/test/main.zig"),
             .target = b.graph.host,
         }),
     });
+    tests.root_module.addImport("core", core);
+    tests.root_module.addImport("source", source);
     tests.root_module.addImport("parser", parser.root_module);
     test_step.dependOn(&b.addRunArtifact(tests).step);
 
