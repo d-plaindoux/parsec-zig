@@ -4,9 +4,9 @@ const Result = @import("data/result.zig").Result;
 
 pub fn Return(comptime I: type, comptime O: type) type {
     return struct {
-        value: O,
-
         const Self = @This();
+
+        value: O,
 
         pub fn parser(self: *const Self) Parser(I, O) {
             return Parser(I, O).from(self);
@@ -24,9 +24,9 @@ pub fn Return(comptime I: type, comptime O: type) type {
 
 pub fn Failure(comptime I: type, comptime O: type) type {
     return struct {
-        reason: ?[]const u8,
-
         const Self = @This();
+
+        reason: ?[]const u8,
 
         pub fn parser(self: *const Self) Parser(I, O) {
             return Parser(I, O).from(self);
