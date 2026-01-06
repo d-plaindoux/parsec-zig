@@ -1,6 +1,6 @@
 const std = @import("std");
 const Pair = @import("core").data.Pair;
-const Source = @import("../source.zig").Source;
+const Source = @import("source.zig").Source;
 
 pub fn ArraySource(comptime T: type) type {
     return struct {

@@ -1,2 +1,2 @@
-pub const data = @import("data/main.zig");
-pub const fun = @import("fun/main.zig");
+pub const data = @import("src/data/main.zig");
+pub const fun = @import("src/fun/main.zig");

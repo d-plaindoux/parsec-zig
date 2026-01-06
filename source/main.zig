@@ -1,2 +1,2 @@
-pub const Source = @import("source.zig").Source;
-pub const ArraySource = @import("impl/array_source.zig").ArraySource;
+pub const Source = @import("src/source.zig").Source;
+pub const ArraySource = @import("src/array_source.zig").ArraySource;

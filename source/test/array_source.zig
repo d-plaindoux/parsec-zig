@@ -1,5 +1,4 @@
 const std = @import("std");
-const Pair = @import("core").data.Pair;
 const ArraySource = @import("source").ArraySource;
 
 test "should retrieve the first item" {
