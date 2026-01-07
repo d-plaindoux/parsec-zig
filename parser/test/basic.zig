@@ -8,15 +8,14 @@ test "should returns a value" {
     const parser = basic.Return(u8, u8).init(42).parser();
 
     // When
-    const isSuccess = switch (parser.run(source)) {
+    const result = switch (parser.run(source)) {
         .Success => |v| v.value,
         .Failure => null,
     };
 
     // Then
-    try expect(42, isSuccess);
+    try expect(42, result);
 }
-
 
 test "should returns an error" {
     // Given
@@ -24,11 +23,71 @@ test "should returns an error" {
     const parser = basic.Failure(u8, u8).init("error").parser();
 
     // When
-    const isSuccess = switch (parser.run(source)) {
+    const result = switch (parser.run(source)) {
         .Success => null,
         .Failure => |v| v.reason,
     };
 
     // Then
-    try expect("error", isSuccess);
+    try expect("error", result);
+}
+
+test "should parse one character" {
+    // Given
+    const source = ArraySource(u8).init("hello", 0).source();
+    const parser = basic.Any(u8).init.parser();
+
+    // When
+    const result = switch (parser.run(source)) {
+        .Success => |v| v.value,
+        .Failure => null,
+    };
+
+    // Then
+    try expect('h', result);
+}
+
+test "should parse and consume one character" {
+    // Given
+    const source = ArraySource(u8).init("hello", 0).source();
+    const parser = basic.Any(u8).init.parser();
+
+    // When
+    const result = switch (parser.run(source)) {
+        .Success => |v| v.consumed,
+        .Failure => false,
+    };
+
+    // Then
+    try expect(true, result);
+}
+
+test "should not parse one character" {
+    // Given
+    const source = ArraySource(u8).init("", 0).source();
+    const parser = basic.Any(u8).init.parser();
+
+    // When
+    const result = switch (parser.run(source)) {
+        .Success => null,
+        .Failure => true,
+    };
+
+    // Then
+    try expect(true, result);
+}
+
+test "should parse empty source" {
+    // Given
+    const source = ArraySource(u8).init("", 0).source();
+    const parser = basic.Eos(u8).init.parser();
+
+    // When
+    const result = switch (parser.run(source)) {
+        .Success => true,
+        .Failure => null,
+    };
+
+    // Then
+    try expect(true, result);
 }
