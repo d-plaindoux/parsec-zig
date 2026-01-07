@@ -14,7 +14,7 @@ pub fn Satisfy(comptime I: type, comptime O: type) type {
             return Parser(I, O).from(self);
         }
 
-        pub fn init(inner: Parser(I, O), predicate: *const fn (O) bool) Self {
+        pub fn init(inner: Parser(I, O), predicate: fn (O) bool) Self {
             return .{ .inner = inner, .predicate = predicate };
         }
 
@@ -43,7 +43,7 @@ pub fn Map(comptime I: type, comptime A: type, comptime B: type) type {
             return Parser(I, B).from(self);
         }
 
-        pub fn init(inner: Parser(I, A), mapper: *const fn (A) B) Self {
+        pub fn init(inner: Parser(I, A), mapper: fn (A) B) Self {
             return .{ .inner = inner, .mapper = mapper };
         }
 
@@ -67,17 +67,15 @@ pub fn Bind(comptime I: type, comptime A: type, comptime B: type) type {
             return Parser(I, B).from(self);
         }
 
-        pub fn init(inner: Parser(I, A), binder: *const fn (A) Parser(I, B)) Self {
+        pub fn init(inner: Parser(I, A), binder: fn (A) Parser(I, B)) Self {
             return .{ .inner = inner, .binder = binder };
         }
 
         pub fn run(self: Self, source: Source(I)) Result(I, B) {
             return switch (self.inner.run(source)) {
-                .Success => |s1| {
-                    switch (self.binder(s1.value).run(s1.source)) {
-                        .Success => |s2| Result(I, B).success(s2.value, s1.consumed or s2.consumed, s2.source),
-                        .Failure => |f| Result(I, B).failure(f.reason, s1.consumed or f.consumed, f.source),
-                    }
+                .Success => |s1| switch (self.binder(s1.value).run(s1.source)) {
+                    .Success => |s2| Result(I, B).success(s2.value, s1.consumed or s2.consumed, s2.source),
+                    .Failure => |f| Result(I, B).failure(f.reason, s1.consumed or f.consumed, f.source),
                 },
                 .Failure => |f| Result(I, B).failure(f.reason, f.consumed, f.source),
             };

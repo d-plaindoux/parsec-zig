@@ -6,8 +6,6 @@ const basic = @import("parser").basic;
 const control = @import("parser").control;
 const flow = @import("parser").flow;
 
-const Self = @This();
-
 fn check(l: u8) fn (u8) bool {
     return struct {
         fn eq(r: u8) bool {
@@ -36,7 +34,7 @@ test "should parse one characters" {
     // Given
     const source = ArraySource(u8).init("e", 0).source();
     const rhd = basic.Any(u8).init.parser();
-    const lhd = control.Satisfy(u8, u8).init(rhd, Self.check('h')).parser();
+    const lhd = control.Satisfy(u8, u8).init(rhd, check('h')).parser();
     const parser = flow.Or(u8, u8).init(lhd, rhd).parser();
 
     // When

@@ -56,11 +56,10 @@ pub fn Any(comptime I: type) type {
         pub fn run(_: Self, source: Source(I)) Result(I, I) {
             const result = source.next();
 
-            if (result.fst()) |v| {
-                return Result(I, I).success(v, true, result.snd());
-            } else {
-                return Result(I, I).failure(null, false, result.snd());
-            }
+            return if (result.fst()) |v|
+                Result(I, I).success(v, true, result.snd())
+            else
+                Result(I, I).failure(null, false, result.snd());
         }
     };
 }
@@ -78,11 +77,10 @@ pub fn Eos(comptime I: type) type {
         pub fn run(_: Self, source: Source(I)) Result(I, Unit) {
             const result = source.next();
 
-            if (result.fst() != null) {
-                return Result(I, Unit).failure("Waiting for an empty source", true, source);
-            } else {
+            return if (result.fst() != null)
+                Result(I, Unit).failure("Waiting for an empty source", true, source)
+            else
                 return Result(I, Unit).success(Unit.unit(), false, result.snd());
-            }
         }
     };
 }
