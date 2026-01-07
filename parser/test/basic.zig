@@ -55,7 +55,7 @@ test "should parse and consume one character" {
     // When
     const result = switch (parser.run(source)) {
         .Success => |v| v.consumed,
-        .Failure => false,
+        .Failure => null,
     };
 
     // Then

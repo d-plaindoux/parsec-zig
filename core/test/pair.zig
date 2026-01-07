@@ -11,7 +11,7 @@ test "should return Pair first" {
 test "should return Pair second" {
     const expect = @import("std").testing.expectEqualDeep;
 
-    const p = Pair(u8,[]const u8).init(1, "hello");
+    const p = Pair(u8, []const u8).init(1, "hello");
 
     try expect("hello", p.snd());
 }
