@@ -84,6 +84,7 @@ pub const Binder = struct {
     pub const init: Self = Self{};
 
     pub fn apply(_: Self, value: u8) spec.Parser(u8, u8) {
+        // Problem: the inner parser is fried here ...
         return basic.Element(u8).init(value).parser();
     }
 };
