@@ -14,17 +14,16 @@ pub fn Parser(comptime I: type, comptime O: type) type {
         };
 
         pub fn from(impl_obj: anytype) Self {
+            const adapter = Adapter(@TypeOf(impl_obj));
             return .{
                 .v_impl = impl_obj,
                 .v_table = &VTable{
-                    .run = Adapter(impl_obj).run,
+                    .run = adapter.run,
                 },
             };
         }
 
-        inline fn Adapter(impl_obj: anytype) type {
-            const ImplType = @TypeOf(impl_obj);
-
+        inline fn Adapter(ImplType: type) type {
             return struct {
                 fn run(impl: *const anyopaque, source: Source(I)) Result(I, O) {
                     return constCast(ImplType, impl).run(source);

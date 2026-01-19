@@ -15,7 +15,7 @@ pub fn And(comptime I: type, comptime A: type, comptime B: type) type {
         }
 
         pub fn init(lhd: Parser(I, A), rhd: Parser(I, B)) Self {
-            return .{ .lhd = lhd, .rhd = rhd };
+            return Self{ .lhd = lhd, .rhd = rhd };
         }
 
         pub fn run(self: Self, source: Source(I)) Result(I, Pair(A, B)) {
@@ -42,7 +42,7 @@ pub fn Or(comptime I: type, comptime O: type) type {
         }
 
         pub fn init(lhd: Parser(I, O), rhd: Parser(I, O)) Self {
-            return .{ .lhd = lhd, .rhd = rhd };
+            return Self{ .lhd = lhd, .rhd = rhd };
         }
 
         pub fn run(self: Self, source: Source(I)) Result(I, O) {

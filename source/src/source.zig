@@ -13,17 +13,17 @@ pub fn Source(comptime T: type) type {
         };
 
         pub fn from(impl_obj: anytype) Self {
-            return .{
+            const adapter = Adapter(@TypeOf(impl_obj));
+
+            return Self{
                 .v_impl = impl_obj,
                 .v_table = &VTable{
-                    .next = Adapter(impl_obj).next,
+                    .next = adapter.next,
                 },
             };
         }
 
-        inline fn Adapter(impl_obj: anytype) type {
-            const ImplType = @TypeOf(impl_obj);
-
+        inline fn Adapter(ImplType: type) type {
             return struct {
                 fn next(impl: *const anyopaque) Pair(?T, Self) {
                     const result = constCast(ImplType, impl).next();

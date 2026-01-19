@@ -1,3 +1,4 @@
+pub const closure = @import("closure.zig");
 pub const pair = @import("pair.zig");
 pub const tries = @import("try.zig");
 

@@ -1,3 +1,4 @@
+const std = @import("std");
 const Unit = @import("core").data.Unit;
 const Source = @import("source").Source;
 const Parser = @import("parsec.zig").Parser;
@@ -34,7 +35,7 @@ pub fn Failure(comptime I: type, comptime O: type) type {
         }
 
         pub fn init(reason: ?[]const u8) Self {
-            return .{ .reason = reason };
+            return Self{ .reason = reason };
         }
 
         pub fn run(self: Self, source: Source(I)) Result(I, O) {
@@ -51,7 +52,7 @@ pub fn Any(comptime I: type) type {
             return Parser(I, I).from(self);
         }
 
-        pub const init: Self = .{};
+        pub const init: Self = Self{};
 
         pub fn run(_: Self, source: Source(I)) Result(I, I) {
             const result = source.next();
@@ -59,7 +60,46 @@ pub fn Any(comptime I: type) type {
             return if (result.fst()) |v|
                 Result(I, I).success(v, true, result.snd())
             else
-                Result(I, I).failure(null, false, result.snd());
+                Result(I, I).failure("Empty source while waiting for an element", false, result.snd());
+        }
+    };
+}
+
+pub fn Element(comptime I: type) type {
+    return struct {
+        const Self = @This();
+
+        element: I,
+
+        pub fn parser(self: *const Self) Parser(I, I) {
+            return Parser(I, I).from(self);
+        }
+
+        pub fn init(element: I) Self {
+            return Self{ .element = element };
+        }
+
+        pub fn run(self: Self, source: Source(I)) Result(I, I) {
+            const result = source.next();
+
+            return if (result.fst()) |v|
+                if (std.meta.eql(v, self.element))
+                    Result(I, I).success(v, true, result.snd())
+                else
+                    Result(I, I).failure(self.comparisonError(v), false, result.snd())
+            else
+                Result(I, I).failure("Empty source while waiting for an element", false, result.snd());
+        }
+
+        pub fn comparisonError(self: Self, v: I) []const u8 {
+            const common = "Element comparison fails";
+
+            var buf: [1024]u8 = undefined;
+            return std.fmt.bufPrint(
+                &buf,
+                "{s}: expecting {any}, found {any}",
+                .{ common, self.element, v },
+            ) catch common;
         }
     };
 }
@@ -72,13 +112,13 @@ pub fn Eos(comptime I: type) type {
             return Parser(I, Unit).from(self);
         }
 
-        pub const init: Self = .{};
+        pub const init: Self = Self{};
 
         pub fn run(_: Self, source: Source(I)) Result(I, Unit) {
             const result = source.next();
 
-            return if (result.fst() != null)
-                Result(I, Unit).failure("Waiting for an empty source", true, source)
+            if (result.fst() != null)
+                return Result(I, Unit).failure("Waiting for an empty source", true, source)
             else
                 return Result(I, Unit).success(Unit.unit(), false, result.snd());
         }

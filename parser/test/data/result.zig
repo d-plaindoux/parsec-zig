@@ -4,7 +4,7 @@ const Result = @import("parser").data.Result;
 
 test "should match a success" {
     // Given
-    const result = Result(u8, u8).success('1', true, ArraySource(u8).init("", 0).source());
+    const result = Result(u8, u8).success('1', true, ArraySource(u8).init("").source());
 
     // When
     const isSuccess = switch (result) {
@@ -18,7 +18,7 @@ test "should match a success" {
 
 test "should match a success value" {
     // Given
-    const result = Result(u8, u8).success('1', true, ArraySource(u8).init("", 0).source());
+    const result = Result(u8, u8).success('1', true, ArraySource(u8).init("").source());
 
     // When
     const value = switch (result) {
@@ -32,7 +32,7 @@ test "should match a success value" {
 
 test "should match a success consumed" {
     // Given
-    const result = Result(u8, u8).success('1', true, ArraySource(u8).init("", 0).source());
+    const result = Result(u8, u8).success('1', true, ArraySource(u8).init("").source());
 
     // When
     const value = switch (result) {
@@ -46,7 +46,7 @@ test "should match a success consumed" {
 
 test "should match a failure" {
     // Given
-    const result = Result(u8, u8).failure(null, true, ArraySource(u8).init("", 0).source());
+    const result = Result(u8, u8).failure(null, true, ArraySource(u8).init("").source());
 
     // When
     const isSuccess = switch (result) {
@@ -60,7 +60,7 @@ test "should match a failure" {
 
 test "should match a failure consumed" {
     // Given
-    const result = Result(u8, u8).failure(null, true, ArraySource(u8).init("", 0).source());
+    const result = Result(u8, u8).failure(null, true, ArraySource(u8).init("").source());
 
     // When
     const value = switch (result) {

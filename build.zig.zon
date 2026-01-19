@@ -1,0 +1,6 @@
+.{
+    .name = .parsec_zig,
+    .version = "0.15.2",
+    .paths = .{""},
+    .fingerprint = 0x466461412ba673b6,
+}
