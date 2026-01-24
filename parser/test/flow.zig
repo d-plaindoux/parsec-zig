@@ -11,7 +11,7 @@ const check = @import("utils/check.zig").check;
 test "should parse two characters" {
     // Given
     const source = ArraySource(u8).init("he").source();
-    const inner = basic.Any(u8).init.parser();
+    const inner = basic.any(u8);
     const parser = flow.And(u8, u8, u8).init(inner, inner).parser();
 
     // When
@@ -27,8 +27,8 @@ test "should parse two characters" {
 test "should parse one character with left selector" {
     // Given
     const source = ArraySource(u8).init("h").source();
-    const lhd = basic.Element(u8).init('h').parser();
-    const rhd = basic.Element(u8).init('e').parser();
+    const lhd = basic.element(u8)('h');
+    const rhd = basic.element(u8)('e');
     const parser = flow.Or(u8, u8).init(lhd, rhd).parser();
 
     // When
@@ -44,8 +44,8 @@ test "should parse one character with left selector" {
 test "should parse one character with right selector" {
     // Given
     const source = ArraySource(u8).init("h").source();
-    const lhd = basic.Element(u8).init('e').parser();
-    const rhd = basic.Element(u8).init('h').parser();
+    const lhd = basic.element(u8)('e');
+    const rhd = basic.element(u8)('h');
     const parser = flow.Or(u8, u8).init(lhd, rhd).parser();
 
     // When

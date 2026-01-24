@@ -5,7 +5,7 @@ const Parser = @import("parsec.zig").Parser;
 const Result = @import("data/result.zig").Result;
 const Any = @import("basic.zig").Any;
 
-pub fn Satisfy(comptime I: type, comptime O: type) type {
+fn Satisfy(comptime I: type, comptime O: type) type {
     return struct {
         const Self = @This();
 
@@ -34,7 +34,8 @@ pub fn Satisfy(comptime I: type, comptime O: type) type {
     };
 }
 
-pub fn Map(comptime I: type, comptime A: type, comptime B: type) type {
+
+fn Map(comptime I: type, comptime A: type, comptime B: type) type {
     return struct {
         const Self = @This();
 
@@ -58,7 +59,8 @@ pub fn Map(comptime I: type, comptime A: type, comptime B: type) type {
     };
 }
 
-pub fn Bind(comptime I: type, comptime A: type, comptime B: type) type {
+
+fn Bind(comptime I: type, comptime A: type, comptime B: type) type {
     return struct {
         const Self = @This();
 
@@ -83,4 +85,28 @@ pub fn Bind(comptime I: type, comptime A: type, comptime B: type) type {
             };
         }
     };
+}
+
+pub inline fn satisfy(comptime I: type, comptime O: type) fn (Parser(I, O), Predicate(O)) Parser(I, O) {
+    return struct {
+        fn init(inner: Parser(I, O), predicate: Predicate(O)) Parser(I, O) {
+            return Satisfy(I, O).init(inner, predicate).parser();
+        }
+    }.init;
+}
+
+pub inline fn map(comptime I: type, comptime A: type, comptime B: type) fn (Parser(I, A), Closure(A, B)) Parser(I, B) {
+    return struct {
+        fn init(inner: Parser(I, A), mapper: Closure(A, B)) Parser(I, B) {
+            return Map(I, A, B).init(inner, mapper).parser();
+        }
+    }.init;
+}
+
+pub inline fn bind(comptime I: type, comptime A: type, comptime B: type) fn (Parser(I, A), Closure(A, Parser(I, B))) Parser(I, B) {
+    return struct {
+        fn init(inner: Parser(I, A), mapper: Closure(A, Parser(I, B))) Parser(I, B) {
+            return Bind(I, A, B).init(inner, mapper).parser();
+        }
+    }.init;
 }

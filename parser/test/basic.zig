@@ -5,7 +5,7 @@ const basic = @import("parser").basic;
 test "should returns a value" {
     // Given
     const source = ArraySource(u8).init("").source();
-    const parser = basic.Return(u8, u8).init(42).parser();
+    const parser = basic.returns(u8, u8)(42);
 
     // When
     const result = switch (parser.run(source)) {
@@ -20,7 +20,7 @@ test "should returns a value" {
 test "should returns an error" {
     // Given
     const source = ArraySource(u8).init("").source();
-    const parser = basic.Failure(u8, u8).init("error").parser();
+    const parser = basic.failure(u8, u8)("error");
 
     // When
     const result = switch (parser.run(source)) {
@@ -35,7 +35,7 @@ test "should returns an error" {
 test "should parse one character" {
     // Given
     const source = ArraySource(u8).init("hello").source();
-    const parser = basic.Any(u8).init.parser();
+    const parser = basic.any(u8);
 
     // When
     const result = switch (parser.run(source)) {
@@ -50,7 +50,7 @@ test "should parse one character" {
 test "should parse and consume one character" {
     // Given
     const source = ArraySource(u8).init("hello").source();
-    const parser = basic.Any(u8).init.parser();
+    const parser = basic.any(u8);
 
     // When
     const result = switch (parser.run(source)) {
@@ -65,7 +65,7 @@ test "should parse and consume one character" {
 test "should parse one specific character" {
     // Given
     const source = ArraySource(u8).init("hello").source();
-    const parser = basic.Element(u8).init('h').parser();
+    const parser = basic.element(u8)('h');
 
     // When
     const result = switch (parser.run(source)) {
@@ -80,7 +80,7 @@ test "should parse one specific character" {
 test "should parse and consume one specific character" {
     // Given
     const source = ArraySource(u8).init("hello").source();
-    const parser = basic.Element(u8).init('h').parser();
+    const parser = basic.element(u8)('h');
 
     // When
     const result = switch (parser.run(source)) {
@@ -95,7 +95,7 @@ test "should parse and consume one specific character" {
 test "should not parse one character" {
     // Given
     const source = ArraySource(u8).init("").source();
-    const parser = basic.Any(u8).init.parser();
+    const parser = basic.any(u8);
 
     // When
     const result = switch (parser.run(source)) {
@@ -110,7 +110,7 @@ test "should not parse one character" {
 test "should parse empty source" {
     // Given
     const source = ArraySource(u8).init("").source();
-    const parser = basic.Eos(u8).init.parser();
+    const parser = basic.eos(u8);
 
     // When
     const result = switch (parser.run(source)) {

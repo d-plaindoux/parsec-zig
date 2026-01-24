@@ -4,7 +4,7 @@ const Source = @import("source").Source;
 const Parser = @import("parsec.zig").Parser;
 const Result = @import("data/result.zig").Result;
 
-pub fn Return(comptime I: type, comptime O: type) type {
+fn Return(comptime I: type, comptime O: type) type {
     return struct {
         const Self = @This();
 
@@ -24,7 +24,7 @@ pub fn Return(comptime I: type, comptime O: type) type {
     };
 }
 
-pub fn Failure(comptime I: type, comptime O: type) type {
+fn Failure(comptime I: type, comptime O: type) type {
     return struct {
         const Self = @This();
 
@@ -44,7 +44,7 @@ pub fn Failure(comptime I: type, comptime O: type) type {
     };
 }
 
-pub fn Any(comptime I: type) type {
+fn Any(comptime I: type) type {
     return struct {
         const Self = @This();
 
@@ -65,7 +65,7 @@ pub fn Any(comptime I: type) type {
     };
 }
 
-pub fn Element(comptime I: type) type {
+fn Element(comptime I: type) type {
     return struct {
         const Self = @This();
 
@@ -75,8 +75,8 @@ pub fn Element(comptime I: type) type {
             return Parser(I, I).from(self);
         }
 
-        pub fn init(element: I) Self {
-            return Self{ .element = element };
+        pub fn init(value: I) Self {
+            return Self{ .element = value };
         }
 
         pub fn run(self: Self, source: Source(I)) Result(I, I) {
@@ -104,7 +104,7 @@ pub fn Element(comptime I: type) type {
     };
 }
 
-pub fn Eos(comptime I: type) type {
+fn Eos(comptime I: type) type {
     return struct {
         const Self = @This();
 
@@ -123,4 +123,36 @@ pub fn Eos(comptime I: type) type {
                 return Result(I, Unit).success(Unit.unit(), false, result.snd());
         }
     };
+}
+
+pub inline fn returns(comptime I: type, comptime O: type) fn (O) Parser(I, O) {
+    return struct {
+        fn init(value: O) Parser(I, O) {
+            return Return(I, O).init(value).parser();
+        }
+    }.init;
+}
+
+pub inline fn failure(comptime I: type, comptime O: type) fn (?[]const u8) Parser(I, O) {
+    return struct {
+        fn init(message: ?[]const u8) Parser(I, O) {
+            return Failure(I, O).init(message).parser();
+        }
+    }.init;
+}
+
+pub inline fn any(comptime I: type) Parser(I, I) {
+    return Any(I).init.parser();
+}
+
+pub inline fn element(comptime I: type) fn (I) Parser(I, I) {
+    return struct {
+        fn init(value: I) Parser(I, I) {
+            return Element(I).init(value).parser();
+        }
+    }.init;
+}
+
+pub inline fn eos(comptime I: type) Parser(I, Unit) {
+    return Eos(I).init.parser();
 }

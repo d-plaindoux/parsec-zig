@@ -13,8 +13,7 @@ const check = @import("utils/check.zig").check;
 test "should parse and satisfy" {
     // Given
     const source = ArraySource(u8).init("h").source();
-    const inner = basic.Any(u8).init.parser();
-    const parser = control.Satisfy(u8, u8).init(inner, check('h')).parser();
+    const parser = control.satisfy(u8, u8)(basic.any(u8), check('h'));
 
     // When
     const result = switch (parser.run(source)) {
@@ -29,8 +28,7 @@ test "should parse and satisfy" {
 test "should parse and satisfy consume" {
     // Given
     const source = ArraySource(u8).init("h").source();
-    const inner = basic.Any(u8).init.parser();
-    const parser = control.Satisfy(u8, u8).init(inner, check('h')).parser();
+    const parser = control.satisfy(u8, u8)(basic.any(u8), check('h'));
 
     // When
     const result = switch (parser.run(source)) {
@@ -45,8 +43,7 @@ test "should parse and satisfy consume" {
 test "should parse and map" {
     // Given
     const source = ArraySource(u8).init("h").source();
-    const inner = basic.Any(u8).init.parser();
-    const parser = control.Map(u8, u8, bool).init(inner, check('h')).parser();
+    const parser = control.map(u8, u8, bool)(basic.any(u8), check('h'));
 
     // When
     const result = switch (parser.run(source)) {
@@ -61,8 +58,7 @@ test "should parse and map" {
 test "should parse and map consume" {
     // Given
     const source = ArraySource(u8).init("h").source();
-    const inner = basic.Any(u8).init.parser();
-    const parser = control.Map(u8, u8, bool).init(inner, check('h')).parser();
+    const parser = control.map(u8, u8, bool)(basic.any(u8), check('h'));
 
     // When
     const result = switch (parser.run(source)) {
@@ -84,32 +80,16 @@ pub const Binder = struct {
     pub const init: Self = Self{};
 
     pub fn apply(_: Self, value: u8) spec.Parser(u8, u8) {
-        return basic.Element(u8).init(value).parser();
+        return control.satisfy(u8, u8)(basic.any(u8), check(value));
     }
 };
 
 const sameOne = Binder.init.closure();
 
-test "should parse with binded function" {
-    // Given
-    const source = ArraySource(u8).init("h").source();
-    const parser = sameOne.apply('h');
-
-    // When
-    const result = switch (parser.run(source)) {
-        .Success => |v| v.value,
-        .Failure => null,
-    };
-
-    // Then
-    try expect('h', result);
-}
-
 test "should parse and bind consume" {
     // Given
     const source = ArraySource(u8).init("hh").source();
-    const inner = basic.Any(u8).init.parser();
-    const parser = control.Bind(u8, u8, u8).init(inner, sameOne).parser();
+    const parser = control.bind(u8, u8, u8)(basic.any(u8), sameOne);
 
     // When
     const result = switch (parser.run(source)) {

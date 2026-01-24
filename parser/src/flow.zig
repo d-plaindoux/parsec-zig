@@ -53,3 +53,5 @@ pub fn Or(comptime I: type, comptime O: type) type {
         }
     };
 }
+
+// TODO: ANd and Or
