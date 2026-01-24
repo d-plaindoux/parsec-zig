@@ -23,7 +23,7 @@ test "should parse and satisfy" {
     };
 
     // Then
-    try expect(null, result);
+    try expect('h', result);
 }
 
 test "should parse and satisfy consume" {
@@ -39,7 +39,7 @@ test "should parse and satisfy consume" {
     };
 
     // Then
-    try expect(null, result);
+    try expect(true, result);
 }
 
 test "should parse and map" {
@@ -55,7 +55,7 @@ test "should parse and map" {
     };
 
     // Then
-    try expect(false, result);
+    try expect(true, result);
 }
 
 test "should parse and map consume" {
@@ -77,14 +77,13 @@ test "should parse and map consume" {
 pub const Binder = struct {
     const Self = @This();
 
-    pub fn closure(self: Self) Closure(u8, spec.Parser(u8, u8)) {
-        return Closure(u8, spec.Parser(u8, u8)).from(&self);
+    pub fn closure(self: *const Self) Closure(u8, spec.Parser(u8, u8)) {
+        return Closure(u8, spec.Parser(u8, u8)).from(self);
     }
 
     pub const init: Self = Self{};
 
     pub fn apply(_: Self, value: u8) spec.Parser(u8, u8) {
-        // Problem: the inner parser is fried here ...
         return basic.Element(u8).init(value).parser();
     }
 };

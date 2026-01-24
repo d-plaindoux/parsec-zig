@@ -1,3 +1,4 @@
+const memory = @import("core").memory;
 const constCast = @import("core").fun.cast.asConst;
 const Source = @import("source").Source;
 const Result = @import("data/result.zig").Result;
@@ -14,9 +15,11 @@ pub fn Parser(comptime I: type, comptime O: type) type {
         };
 
         pub fn from(impl_obj: anytype) Self {
+            memory.Predicate.expectPointer(impl_obj);
+
             const adapter = Adapter(@TypeOf(impl_obj));
             return .{
-                .v_impl = impl_obj,
+                .v_impl = memory.Allocation.copy(@TypeOf(impl_obj.*), impl_obj.*),
                 .v_table = &VTable{
                     .run = adapter.run,
                 },

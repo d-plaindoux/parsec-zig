@@ -5,8 +5,8 @@ pub const Check = struct {
 
     expected: u8,
 
-    fn predicate(self: Self) Predicate(u8) {
-        return Predicate(u8).from(&self);
+    fn predicate(self: *const Self) Predicate(u8) {
+        return Predicate(u8).from(self);
     }
 
     fn init(expected: u8) Self {

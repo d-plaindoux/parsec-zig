@@ -1,3 +1,4 @@
+const memory = @import("../utils/memory.zig");
 const constCast = @import("../fun/cast.zig").asConst;
 
 pub fn Closure(comptime I: type, comptime O: type) type {
@@ -12,9 +13,11 @@ pub fn Closure(comptime I: type, comptime O: type) type {
         };
 
         pub fn from(impl_obj: anytype) Self {
+            memory.Predicate.expectPointer(impl_obj);
+
             const adapter = Adapter(@TypeOf(impl_obj));
             return Self{
-                .v_impl = impl_obj,
+                .v_impl = memory.Allocation.copy(@TypeOf(impl_obj.*), impl_obj.*),
                 .v_table = &VTable{
                     .apply = adapter.apply,
                 },

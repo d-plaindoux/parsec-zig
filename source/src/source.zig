@@ -1,3 +1,4 @@
+const memory = @import("core").memory;
 const constCast = @import("core").fun.cast.asConst;
 const Pair = @import("core").data.Pair;
 
@@ -13,10 +14,12 @@ pub fn Source(comptime T: type) type {
         };
 
         pub fn from(impl_obj: anytype) Self {
+            memory.Predicate.expectPointer(impl_obj);
+
             const adapter = Adapter(@TypeOf(impl_obj));
 
             return Self{
-                .v_impl = impl_obj,
+                .v_impl = memory.Allocation.copy(@TypeOf(impl_obj.*), impl_obj.*),
                 .v_table = &VTable{
                     .next = adapter.next,
                 },

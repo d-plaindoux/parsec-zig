@@ -7,8 +7,8 @@ test "should validate an adder closure" {
 
         offset: u32,
 
-        fn closure(self: Self) Closure(u32, u32) {
-            return Closure(u32, u32).from(&self);
+        fn closure(self: *const Self) Closure(u32, u32) {
+            return Closure(u32, u32).from(self);
         }
 
         fn init(offset: u32) Self {
