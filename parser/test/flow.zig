@@ -12,7 +12,7 @@ test "should parse two characters" {
     // Given
     const source = ArraySource(u8).init("he").source();
     const inner = basic.any(u8);
-    const parser = flow.And(u8, u8, u8).init(inner, inner).parser();
+    const parser = flow.then(u8, u8, u8)(inner, inner);
 
     // When
     const result = switch (parser.run(source)) {
@@ -29,7 +29,7 @@ test "should parse one character with left selector" {
     const source = ArraySource(u8).init("h").source();
     const lhd = basic.element(u8)('h');
     const rhd = basic.element(u8)('e');
-    const parser = flow.Or(u8, u8).init(lhd, rhd).parser();
+    const parser = flow.choice(u8, u8)(lhd, rhd);
 
     // When
     const result = switch (parser.run(source)) {
@@ -46,7 +46,7 @@ test "should parse one character with right selector" {
     const source = ArraySource(u8).init("h").source();
     const lhd = basic.element(u8)('e');
     const rhd = basic.element(u8)('h');
-    const parser = flow.Or(u8, u8).init(lhd, rhd).parser();
+    const parser = flow.choice(u8, u8)(lhd, rhd);
 
     // When
     const result = switch (parser.run(source)) {

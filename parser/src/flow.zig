@@ -3,7 +3,7 @@ const Source = @import("source").Source;
 const Parser = @import("parsec.zig").Parser;
 const Result = @import("data/result.zig").Result;
 
-pub fn And(comptime I: type, comptime A: type, comptime B: type) type {
+fn And(comptime I: type, comptime A: type, comptime B: type) type {
     return struct {
         const Self = @This();
 
@@ -30,7 +30,7 @@ pub fn And(comptime I: type, comptime A: type, comptime B: type) type {
     };
 }
 
-pub fn Or(comptime I: type, comptime O: type) type {
+fn Or(comptime I: type, comptime O: type) type {
     return struct {
         const Self = @This();
 
@@ -54,4 +54,18 @@ pub fn Or(comptime I: type, comptime O: type) type {
     };
 }
 
-// TODO: ANd and Or
+pub inline fn then(comptime I: type, comptime A: type, comptime B: type) fn (Parser(I, A), Parser(I, B)) Parser(I, Pair(A, B)) {
+    return struct {
+        fn init(lhd: Parser(I, A), rhd: Parser(I, B)) Parser(I, Pair(A, B)) {
+            return And(I, A, B).init(lhd, rhd).parser();
+        }
+    }.init;
+}
+
+pub inline fn choice(comptime I: type, comptime A: type) fn (Parser(I, A), Parser(I, A)) Parser(I, A) {
+    return struct {
+        fn init(lhd: Parser(I, A), rhd: Parser(I, A)) Parser(I, A) {
+            return Or(I, A).init(lhd, rhd).parser();
+        }
+    }.init;
+}
