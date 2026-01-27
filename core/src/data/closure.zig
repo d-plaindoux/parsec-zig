@@ -13,7 +13,7 @@ pub fn Closure(comptime I: type, comptime O: type) type {
         };
 
         pub fn from(impl_obj: anytype) Self {
-            memory.Predicate.expectPointer(impl_obj);
+            memory.Representation.expectPointer(impl_obj);
 
             const adapter = Adapter(@TypeOf(impl_obj));
             return Self{

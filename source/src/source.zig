@@ -14,7 +14,7 @@ pub fn Source(comptime T: type) type {
         };
 
         pub fn from(impl_obj: anytype) Self {
-            memory.Predicate.expectPointer(impl_obj);
+            memory.Representation.expectPointer(impl_obj);
 
             const adapter = Adapter(@TypeOf(impl_obj));
 
