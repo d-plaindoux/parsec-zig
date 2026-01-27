@@ -34,7 +34,6 @@ fn Satisfy(comptime I: type, comptime O: type) type {
     };
 }
 
-
 fn Map(comptime I: type, comptime A: type, comptime B: type) type {
     return struct {
         const Self = @This();
@@ -52,13 +51,20 @@ fn Map(comptime I: type, comptime A: type, comptime B: type) type {
 
         pub fn run(self: Self, source: Source(I)) Result(I, B) {
             return switch (self.inner.run(source)) {
-                .Success => |s| Result(I, B).success(self.mapper.apply(s.value), s.consumed, s.source),
-                .Failure => |f| Result(I, B).failure(f.reason, f.consumed, f.source),
+                .Success => |s| Result(I, B).success(
+                    self.mapper.apply(s.value),
+                    s.consumed,
+                    s.source,
+                ),
+                .Failure => |f| Result(I, B).failure(
+                    f.reason,
+                    f.consumed,
+                    f.source,
+                ),
             };
         }
     };
 }
-
 
 fn Bind(comptime I: type, comptime A: type, comptime B: type) type {
     return struct {
@@ -78,15 +84,28 @@ fn Bind(comptime I: type, comptime A: type, comptime B: type) type {
         pub fn run(self: Self, source: Source(I)) Result(I, B) {
             return switch (self.inner.run(source)) {
                 .Success => |s1| switch (self.binder.apply(s1.value).run(s1.source)) {
-                    .Success => |s2| Result(I, B).success(s2.value, s1.consumed or s2.consumed, s2.source),
-                    .Failure => |f| Result(I, B).failure(f.reason, s1.consumed or f.consumed, f.source),
+                    .Success => |s2| Result(I, B).success(
+                        s2.value,
+                        s1.consumed or s2.consumed,
+                        s2.source,
+                    ),
+                    .Failure => |f| Result(I, B).failure(
+                        f.reason,
+                        s1.consumed or f.consumed,
+                        f.source,
+                    ),
                 },
-                .Failure => |f| Result(I, B).failure(f.reason, f.consumed, f.source),
+                .Failure => |f| Result(I, B).failure(
+                    f.reason,
+                    f.consumed,
+                    f.source,
+                ),
             };
         }
     };
 }
 
+/// Public section
 pub inline fn satisfy(comptime I: type, comptime O: type) fn (Parser(I, O), Predicate(O)) Parser(I, O) {
     return struct {
         fn init(inner: Parser(I, O), predicate: Predicate(O)) Parser(I, O) {
@@ -95,7 +114,11 @@ pub inline fn satisfy(comptime I: type, comptime O: type) fn (Parser(I, O), Pred
     }.init;
 }
 
-pub inline fn map(comptime I: type, comptime A: type, comptime B: type) fn (Parser(I, A), Closure(A, B)) Parser(I, B) {
+pub inline fn map(
+    comptime I: type,
+    comptime A: type,
+    comptime B: type,
+) fn (Parser(I, A), Closure(A, B)) Parser(I, B) {
     return struct {
         fn init(inner: Parser(I, A), mapper: Closure(A, B)) Parser(I, B) {
             return Map(I, A, B).init(inner, mapper).parser();
@@ -103,7 +126,11 @@ pub inline fn map(comptime I: type, comptime A: type, comptime B: type) fn (Pars
     }.init;
 }
 
-pub inline fn bind(comptime I: type, comptime A: type, comptime B: type) fn (Parser(I, A), Closure(A, Parser(I, B))) Parser(I, B) {
+pub inline fn bind(
+    comptime I: type,
+    comptime A: type,
+    comptime B: type,
+) fn (Parser(I, A), Closure(A, Parser(I, B))) Parser(I, B) {
     return struct {
         fn init(inner: Parser(I, A), mapper: Closure(A, Parser(I, B))) Parser(I, B) {
             return Bind(I, A, B).init(inner, mapper).parser();

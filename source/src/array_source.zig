@@ -10,8 +10,8 @@ pub fn ArraySource(comptime T: type) type {
         index: usize,
         elements: []const T,
 
-        pub fn source(self: *const Self) Source(u8) {
-            return Source(T).from(self);
+        pub fn source(self: *const Self, options: struct { copy: bool = true }) Source(u8) {
+            return Source(T).from(self, .{ .copy = options.copy });
         }
 
         pub fn init(elements: []const T) Self {

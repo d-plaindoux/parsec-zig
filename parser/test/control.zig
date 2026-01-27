@@ -12,7 +12,7 @@ const check = @import("utils/check.zig").check;
 
 test "should parse and satisfy" {
     // Given
-    const source = ArraySource(u8).init("h").source();
+    const source = ArraySource(u8).init("h").source(.{});
     const parser = control.satisfy(u8, u8)(basic.any(u8), check('h'));
 
     // When
@@ -27,7 +27,7 @@ test "should parse and satisfy" {
 
 test "should parse and satisfy consume" {
     // Given
-    const source = ArraySource(u8).init("h").source();
+    const source = ArraySource(u8).init("h").source(.{});
     const parser = control.satisfy(u8, u8)(basic.any(u8), check('h'));
 
     // When
@@ -42,7 +42,7 @@ test "should parse and satisfy consume" {
 
 test "should parse and map" {
     // Given
-    const source = ArraySource(u8).init("h").source();
+    const source = ArraySource(u8).init("h").source(.{});
     const parser = control.map(u8, u8, bool)(basic.any(u8), check('h'));
 
     // When
@@ -57,7 +57,7 @@ test "should parse and map" {
 
 test "should parse and map consume" {
     // Given
-    const source = ArraySource(u8).init("h").source();
+    const source = ArraySource(u8).init("h").source(.{});
     const parser = control.map(u8, u8, bool)(basic.any(u8), check('h'));
 
     // When
@@ -88,7 +88,7 @@ const sameOne = Binder.init.closure();
 
 test "should parse and bind consume" {
     // Given
-    const source = ArraySource(u8).init("hh").source();
+    const source = ArraySource(u8).init("hh").source(.{});
     const parser = control.bind(u8, u8, u8)(basic.any(u8), sameOne);
 
     // When

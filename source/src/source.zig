@@ -13,24 +13,36 @@ pub fn Source(comptime T: type) type {
             next: *const fn (self: *const anyopaque) Pair(?T, Self),
         };
 
-        pub fn from(impl_obj: anytype) Self {
+        pub inline fn from(impl_obj: anytype, options: struct { copy: bool = true }) Self {
+            // TODO: manage raw value and pointed value here
             memory.Representation.expectPointer(impl_obj);
 
             const adapter = Adapter(@TypeOf(impl_obj));
 
-            return Self{
-                .v_impl = memory.Allocation.copy(@TypeOf(impl_obj.*), impl_obj.*),
-                .v_table = &VTable{
-                    .next = adapter.next,
-                },
-            };
+            return if (options.copy)
+                Self{
+                    .v_impl = memory.Allocation.copy(@TypeOf(impl_obj.*), impl_obj.*),
+                    .v_table = &VTable{
+                        .next = adapter.next,
+                    },
+                }
+            else
+                Self{
+                    .v_impl = impl_obj,
+                    .v_table = &VTable{
+                        .next = adapter.next,
+                    },
+                };
         }
 
         inline fn Adapter(ImplType: type) type {
             return struct {
                 fn next(impl: *const anyopaque) Pair(?T, Self) {
                     const result = constCast(ImplType, impl).next();
-                    return Pair(?T, Self).init(result.fst(), from(&result.snd()));
+                    return Pair(?T, Self).init(
+                        result.fst(),
+                        from(&result.snd(), .{ .copy = true }),
+                    );
                 }
             };
         }

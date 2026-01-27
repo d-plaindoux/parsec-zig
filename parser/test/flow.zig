@@ -10,7 +10,7 @@ const check = @import("utils/check.zig").check;
 
 test "should parse two characters" {
     // Given
-    const source = ArraySource(u8).init("he").source();
+    const source = ArraySource(u8).init("he").source(.{});
     const inner = basic.any(u8);
     const parser = flow.then(u8, u8, u8)(inner, inner);
 
@@ -26,7 +26,7 @@ test "should parse two characters" {
 
 test "should parse one character with left selector" {
     // Given
-    const source = ArraySource(u8).init("h").source();
+    const source = ArraySource(u8).init("h").source(.{});
     const lhd = basic.element(u8)('h');
     const rhd = basic.element(u8)('e');
     const parser = flow.choice(u8, u8)(lhd, rhd);
@@ -43,7 +43,7 @@ test "should parse one character with left selector" {
 
 test "should parse one character with right selector" {
     // Given
-    const source = ArraySource(u8).init("h").source();
+    const source = ArraySource(u8).init("h").source(.{});
     const lhd = basic.element(u8)('e');
     const rhd = basic.element(u8)('h');
     const parser = flow.choice(u8, u8)(lhd, rhd);

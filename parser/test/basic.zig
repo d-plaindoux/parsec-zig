@@ -4,7 +4,7 @@ const basic = @import("parser").basic;
 
 test "should returns a value" {
     // Given
-    const source = ArraySource(u8).init("").source();
+    const source = ArraySource(u8).init("").source(.{});
     const parser = basic.returns(u8, u8)(42);
 
     // When
@@ -19,7 +19,7 @@ test "should returns a value" {
 
 test "should returns an error" {
     // Given
-    const source = ArraySource(u8).init("").source();
+    const source = ArraySource(u8).init("").source(.{});
     const parser = basic.failure(u8, u8)("error");
 
     // When
@@ -34,7 +34,7 @@ test "should returns an error" {
 
 test "should parse one character" {
     // Given
-    const source = ArraySource(u8).init("hello").source();
+    const source = ArraySource(u8).init("hello").source(.{});
     const parser = basic.any(u8);
 
     // When
@@ -49,7 +49,7 @@ test "should parse one character" {
 
 test "should parse and consume one character" {
     // Given
-    const source = ArraySource(u8).init("hello").source();
+    const source = ArraySource(u8).init("hello").source(.{});
     const parser = basic.any(u8);
 
     // When
@@ -64,7 +64,7 @@ test "should parse and consume one character" {
 
 test "should parse one specific character" {
     // Given
-    const source = ArraySource(u8).init("hello").source();
+    const source = ArraySource(u8).init("hello").source(.{});
     const parser = basic.element(u8)('h');
 
     // When
@@ -79,7 +79,7 @@ test "should parse one specific character" {
 
 test "should parse and consume one specific character" {
     // Given
-    const source = ArraySource(u8).init("hello").source();
+    const source = ArraySource(u8).init("hello").source(.{});
     const parser = basic.element(u8)('h');
 
     // When
@@ -94,7 +94,7 @@ test "should parse and consume one specific character" {
 
 test "should not parse one character" {
     // Given
-    const source = ArraySource(u8).init("").source();
+    const source = ArraySource(u8).init("").source(.{});
     const parser = basic.any(u8);
 
     // When
@@ -109,13 +109,28 @@ test "should not parse one character" {
 
 test "should parse empty source" {
     // Given
-    const source = ArraySource(u8).init("").source();
+    const source = ArraySource(u8).init("").source(.{});
     const parser = basic.eos(u8);
 
     // When
     const result = switch (parser.run(source)) {
         .Success => true,
         .Failure => null,
+    };
+
+    // Then
+    try expect(true, result);
+}
+
+test "should not parse empty source" {
+    // Given
+    const source = ArraySource(u8).init("h").source(.{});
+    const parser = basic.eos(u8);
+
+    // When
+    const result = switch (parser.run(source)) {
+        .Success => null,
+        .Failure => true,
     };
 
     // Then

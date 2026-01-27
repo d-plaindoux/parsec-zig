@@ -21,10 +21,22 @@ fn And(comptime I: type, comptime A: type, comptime B: type) type {
         pub fn run(self: Self, source: Source(I)) Result(I, Pair(A, B)) {
             return switch (self.lhd.run(source)) {
                 .Success => |s1| switch (self.rhd.run(s1.source)) {
-                    .Success => |s2| Result(I, Pair(A, B)).success(Pair(A, B).init(s1.value, s2.value), s1.consumed or s2.consumed, s2.source),
-                    .Failure => |f| Result(I, Pair(A, B)).failure(f.reason, s1.consumed or f.consumed, f.source),
+                    .Success => |s2| Result(I, Pair(A, B)).success(
+                        Pair(A, B).init(s1.value, s2.value),
+                        s1.consumed or s2.consumed,
+                        s2.source,
+                    ),
+                    .Failure => |f| Result(I, Pair(A, B)).failure(
+                        f.reason,
+                        s1.consumed or f.consumed,
+                        f.source,
+                    ),
                 },
-                .Failure => |f| Result(I, Pair(A, B)).failure(f.reason, f.consumed, f.source),
+                .Failure => |f| Result(I, Pair(A, B)).failure(
+                    f.reason,
+                    f.consumed,
+                    f.source,
+                ),
             };
         }
     };
@@ -47,14 +59,23 @@ fn Or(comptime I: type, comptime O: type) type {
 
         pub fn run(self: Self, source: Source(I)) Result(I, O) {
             return switch (self.lhd.run(source)) {
-                .Success => |s| Result(I, O).success(s.value, s.consumed, s.source),
+                .Success => |s| Result(I, O).success(
+                    s.value,
+                    s.consumed,
+                    s.source,
+                ),
                 .Failure => self.rhd.run(source),
             };
         }
     };
 }
 
-pub inline fn then(comptime I: type, comptime A: type, comptime B: type) fn (Parser(I, A), Parser(I, B)) Parser(I, Pair(A, B)) {
+/// Public section
+pub inline fn then(
+    comptime I: type,
+    comptime A: type,
+    comptime B: type,
+) fn (Parser(I, A), Parser(I, B)) Parser(I, Pair(A, B)) {
     return struct {
         fn init(lhd: Parser(I, A), rhd: Parser(I, B)) Parser(I, Pair(A, B)) {
             return And(I, A, B).init(lhd, rhd).parser();
@@ -62,7 +83,10 @@ pub inline fn then(comptime I: type, comptime A: type, comptime B: type) fn (Par
     }.init;
 }
 
-pub inline fn choice(comptime I: type, comptime A: type) fn (Parser(I, A), Parser(I, A)) Parser(I, A) {
+pub inline fn choice(
+    comptime I: type,
+    comptime A: type,
+) fn (Parser(I, A), Parser(I, A)) Parser(I, A) {
     return struct {
         fn init(lhd: Parser(I, A), rhd: Parser(I, A)) Parser(I, A) {
             return Or(I, A).init(lhd, rhd).parser();

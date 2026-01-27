@@ -60,7 +60,11 @@ fn Any(comptime I: type) type {
             return if (result.fst()) |v|
                 Result(I, I).success(v, true, result.snd())
             else
-                Result(I, I).failure("Empty source while waiting for an element", false, result.snd());
+                Result(I, I).failure(
+                    "Empty source while waiting for an element",
+                    false,
+                    result.snd(),
+                );
         }
     };
 }
@@ -86,9 +90,17 @@ fn Element(comptime I: type) type {
                 if (std.meta.eql(v, self.element))
                     Result(I, I).success(v, true, result.snd())
                 else
-                    Result(I, I).failure(self.comparisonError(v), false, result.snd())
+                    Result(I, I).failure(
+                        self.comparisonError(v),
+                        false,
+                        result.snd(),
+                    )
             else
-                Result(I, I).failure("Empty source while waiting for an element", false, result.snd());
+                Result(I, I).failure(
+                    "Empty source while waiting for an element",
+                    false,
+                    result.snd(),
+                );
         }
 
         pub fn comparisonError(self: Self, v: I) []const u8 {
@@ -118,13 +130,22 @@ fn Eos(comptime I: type) type {
             const result = source.next();
 
             if (result.fst() != null)
-                return Result(I, Unit).failure("Waiting for an empty source", true, source)
+                return Result(I, Unit).failure(
+                    "Waiting for an empty source",
+                    true,
+                    source,
+                )
             else
-                return Result(I, Unit).success(Unit.unit(), false, result.snd());
+                return Result(I, Unit).success(
+                    Unit.unit(),
+                    false,
+                    result.snd(),
+                );
         }
     };
 }
 
+/// Public section
 pub inline fn returns(comptime I: type, comptime O: type) fn (O) Parser(I, O) {
     return struct {
         fn init(value: O) Parser(I, O) {
