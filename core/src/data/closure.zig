@@ -12,16 +12,35 @@ pub fn Closure(comptime I: type, comptime O: type) type {
             apply: *const fn (self: *const anyopaque, I) O,
         };
 
-        pub fn from(impl_obj: anytype) Self {
-            memory.Representation.expectPointer(impl_obj);
-
-            const adapter = Adapter(@TypeOf(impl_obj));
-            return Self{
-                .v_impl = memory.Allocation.copy(@TypeOf(impl_obj.*), impl_obj.*),
-                .v_table = &VTable{
-                    .apply = adapter.apply,
-                },
-            };
+        pub inline fn from(impl_obj: anytype, options: struct { copy: bool = true }) Self {
+            if (memory.Representation.isPointer(impl_obj)) {
+                const adapter = Adapter(@TypeOf(impl_obj));
+                return if (options.copy) Self{
+                    .v_impl = memory.Allocation.copy(@TypeOf(impl_obj.*), impl_obj.*),
+                    .v_table = &VTable{
+                        .apply = adapter.apply,
+                    },
+                } else Self{
+                    .v_impl = impl_obj,
+                    .v_table = &VTable{
+                        .apply = adapter.apply,
+                    },
+                };
+            } else {
+                const adapter = Adapter(@TypeOf(&impl_obj));
+                return if (options.copy) Self{
+                    .v_impl = memory.Allocation.copy(@TypeOf(impl_obj), impl_obj),
+                    .v_table = &VTable{
+                        .apply = adapter.apply,
+                    },
+                } else Self{
+                    // Is this code relevant?
+                    .v_impl = &impl_obj,
+                    .v_table = &VTable{
+                        .apply = adapter.apply,
+                    },
+                };
+            }
         }
 
         inline fn Adapter(ImplType: type) type {

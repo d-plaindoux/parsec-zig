@@ -22,7 +22,7 @@ test "perform a simple bind" {
     const expect = std.testing.expectEqualDeep;
 
     const v1 = Try(u32).pure(1);
-    const v2 = v1.bind(u32, incrementTry);
+    const v2 = v1.flatMap(u32, incrementTry);
 
     try expect(v2, Try(u32).pure(2));
 }

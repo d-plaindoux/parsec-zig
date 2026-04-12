@@ -74,7 +74,7 @@ pub const Binder = struct {
     const Self = @This();
 
     pub fn closure(self: *const Self) Closure(u8, spec.Parser(u8, u8)) {
-        return Closure(u8, spec.Parser(u8, u8)).from(self);
+        return Closure(u8, spec.Parser(u8, u8)).from(self, .{});
     }
 
     pub const init: Self = Self{};
