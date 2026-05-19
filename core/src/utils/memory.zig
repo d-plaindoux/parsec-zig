@@ -3,6 +3,10 @@ const std = @import("std");
 // Note: inlining do not imply any copy and then preserves passed data.
 
 pub const Representation: type = struct {
+    pub inline fn castTo(comptime T: type, ptr: *anyopaque) *T {
+        return @ptrCast(@alignCast(ptr));
+    }
+
     pub inline fn isPointer(value: anytype) bool {
         const ValueType = @TypeOf(value);
         const TypeInfo = @typeInfo(ValueType);
